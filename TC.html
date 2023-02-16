@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Example</title>
+	<style type="text/css">
+		body {
+			background-color: #000000;
+      overflow: hidden;
+      font-family: 'Arial';
+      font-size: 20pt;
+		}
+
+		#header {
+			height: 100px;
+			width: 100%;
+			position: absolute;
+			top: 0;
+			left: 0;
+			background-color: #000000;
+			color: #ffffff;
+			border: none;
+			z-index: 1;
+			display: table;
+			table-layout: absolute;
+		}
+
+		#header table {
+			width: 100%;
+			border-collapse: collapse;
+			border: none;
+		}
+
+		iframe {
+			width: 100%;
+			height: calc(100vh - 100px);
+
+			margin-top: 0px;
+      top: 0px;
+			border: none;
+		}
+	</style>
+</head>
+<body>
+	<div id="header">
+		<table border="0" style="position: absolute; top:55px;">
+			<tr>
+				<td width="83">期號</td>
+				<td width="143">日期8碼</td>
+				<td width="328">標題</td>
+				<td width="84">分類</td>
+				<td width="941">內容</td>
+			</tr>
+		</table>
+	</div>
+	<iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRp6n-EskuXbvakzJGRXqsRsAkFAW9hF1jR0R6EKT7HyffLRqj0-ABaWOHvuPGg8epsZ7U4gWeTI9tW/pubhtml?gid=546272452&amp;single=true"></iframe>
+</body>
+</html>
