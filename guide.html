@@ -11,14 +11,14 @@
     <meta name="apple-mobile-web-app-title" content="準導覽冊">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#1e40af">
-    <meta name="description" content="智慧結構化文本行動導覽系統">
     
-    <!-- PWA Manifest (Data URI 內嵌) -->
-    <link rel="manifest" href='data:application/manifest+json,{"name":"測試版導覽冊","short_name":"準導覽冊","start_url":".","display":"standalone","background_color":"#ffffff","theme_color":"#1e40af","icons":[{"src":"https://img.icons8.com/ios-filled/192/1e40af/stack.png","sizes":"192x192","type":"image/png"},{"src":"https://img.icons8.com/ios-filled/512/1e40af/stack.png","sizes":"512x512","type":"image/png"}]}'>
+    <!-- ✨ 正式寫法：連結到實體 manifest.json 檔案 -->
+    <link rel="manifest" href="manifest.json">
 
-    <!-- iOS 專用圖標 -->
-    <link rel="apple-touch-icon" href="https://img.icons8.com/ios-filled/180/1e40af/stack.png">
-    <link rel="icon" type="image/png" href="https://img.icons8.com/ios-filled/50/1e40af/stack.png">
+    <!-- ✨ 建議準備實體圖示檔存放於同目錄 -->
+    <link rel="apple-touch-icon" href="icon-180.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="icon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="icon-16.png">
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -62,7 +62,6 @@
             -webkit-overflow-scrolling: touch;
         }
 
-        /* 選單細線樣式 */
         hr { border: 0; border-top: 1px solid rgba(0,0,0,0.05); }
     </style>
 </head>
@@ -93,7 +92,6 @@
             const [expandedPartIdx, setExpandedPartIdx] = useState(null);
             const contentScrollRef = useRef(null);
 
-            // 固定後端資料來源
             const cloudUrl = "https://docs.google.com/document/d/1MklGqY-E5bEDl6eR0Qqt3ZM_T6qMztY92IXPWZt4Iqk/edit?usp=drive_link";
 
             const sanitizeTitle = (str) => {
@@ -173,7 +171,6 @@
                 finally { setIsLoading(false); }
             };
 
-            // 啟動即自動載入內容
             useEffect(() => { performLoad(cloudUrl); }, []);
 
             const currentPart = data[activePartIdx];
@@ -224,7 +221,6 @@
                         <div className="fixed inset-0 z-50 flex items-start justify-center">
                             <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px]" onClick={() => setIsMenuOpen(false)}></div>
                             <aside className="animate-zoomIn w-[94%] h-[calc(100%-100px)] mt-6 bg-white/90 backdrop-blur-2xl shadow-2xl rounded-[2.5rem] flex flex-col border border-white/40 overflow-hidden">
-                                {/* 目錄標題：置中 */}
                                 <div className="p-4 md:p-6 border-b border-gray-200/20 flex items-center justify-center relative bg-white/20">
                                     <span className="font-black text-xl tracking-tighter text-gray-900 uppercase">目錄</span>
                                     <button onClick={() => setIsMenuOpen(false)} className="absolute right-4 p-2 bg-gray-100 rounded-full active:scale-90 transition-transform"><Icons.X size={24} /></button>
@@ -251,7 +247,6 @@
                                                     </button>
                                                 </div>
                                                 
-                                                {/* 下一層級項目列：移除間距，加入 HR 細線與前綴 */}
                                                 {expandedPartIdx === pIdx && (
                                                     <div className="flex flex-col bg-gray-50/50">
                                                         {part.chapters.map((chap, cIdx) => (
@@ -271,7 +266,6 @@
                                         ))
                                     )}
                                 </nav>
-                                {/* ✨ 修正：已移除原有的系統重置區塊及其背景線條 */}
                             </aside>
                         </div>
                     )}
@@ -292,7 +286,6 @@
 
                                 {viewMode !== "part" && currentChap?.sections?.length > 0 && (
                                     <div className="bg-white/95 backdrop-blur-md z-20 border-b shrink-0">
-                                        {/* 小節下拉選單切換按鈕 */}
                                         <button 
                                             onClick={() => {
                                                 if (isSecDropdownOpen) {
@@ -384,7 +377,6 @@
             );
         };
 
-        // 媒體渲染輔助
         const MediaRenderer = ({ content, placeholder }) => {
             if (!content) return <img src={placeholder} className="w-full h-full object-cover opacity-40 grayscale" />;
             if (content.trim().startsWith('<')) return <div className="w-full h-full bg-black flex items-center justify-center relative" dangerouslySetInnerHTML={{ __html: content }} />;
@@ -399,23 +391,12 @@
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<App />);
 
+        // ✨ 修正：使用實體路徑註冊 Service Worker
         if ('serviceWorker' in navigator) {
-            const swCode = `
-                const CACHE_NAME = 'guide-v2';
-                self.addEventListener('install', (e) => {
-                    self.skipWaiting();
-                    e.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll([location.href])));
-                });
-                self.addEventListener('activate', (e) => {
-                    e.waitUntil(clients.claim());
-                });
-                self.addEventListener('fetch', (e) => {
-                    e.respondWith(caches.match(e.request).then((res) => res || fetch(e.request)));
-                });
-            `;
-            const blob = new Blob([swCode], { type: 'application/javascript' });
-            const swUrl = URL.createObjectURL(blob);
-            navigator.serviceWorker.register(swUrl).catch((err) => console.log('SW ERR:', err));
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                .catch((err) => console.log('SW 註冊失敗，請確認 sw.js 檔案存在於伺服器根目錄:', err));
+            });
         }
     </script>
 </body>
