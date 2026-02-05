@@ -1,0 +1,36 @@
+{
+  "name": "測試版導覽冊",
+  "short_name": "準導覽冊",
+  "start_url": "mobile.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1e40af",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
+
+#### 2. 建立 `sw.js` 檔案
+這是一個極簡的 Service Worker，能滿足瀏覽器的安裝要求。內容如下：
+```javascript
+const CACHE_NAME = 'guide-cache-v1';
+self.addEventListener('install', (event) => {
+  self.skipWaiting();
+});
+self.addEventListener('fetch', (event) => {
+  event.respondWith(fetch(event.request));
+});
+
+#### 3. 準備圖示檔案
+請將您設計的 icon 存成 `icon-192.png` 和 `icon-512.png` 並放在同目錄下。
+
+一旦這三個檔案與 `mobile.html` 一起透過 **HTTPS** 網址發布，Android 用戶會看到「安裝應用程式」的橫幅，iOS 用戶在點擊「分享」選單後，選擇「加入主畫面」將會以無網址列的 PWA 模式開啟。
