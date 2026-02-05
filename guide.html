@@ -3,13 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>智慧行動導覽系統 - 修正與優化版</title>
+    <title>智慧行動導覽系統 - 試營運正式版</title>
     
-    <!-- PWA 配置 -->
+    <!-- PWA 配置：讓網站擁有類 App 體驗 -->
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#1e40af">
     
+    <!-- 暫代圖標 (選用簡約層級圖示) -->
+    <link rel="apple-touch-icon" href="https://img.icons8.com/ios-filled/180/1e40af/stack.png">
+    <link rel="icon" type="image/png" href="https://img.icons8.com/ios-filled/50/1e40af/stack.png">
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- React & ReactDOM -->
@@ -19,11 +24,9 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
     <style>
-        /* 隱藏捲動條但保留功能 */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
-        /* 置中縮放動畫 */
         @keyframes zoomIn {
             from { opacity: 0; transform: scale(0.9) translate(-50%, -50%); }
             to { opacity: 1; transform: scale(1) translate(-50%, -50%); }
@@ -39,12 +42,10 @@
         @keyframes fadeInDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
         .animate-dropdown { animation: fadeInDown 0.2s ease-out forwards; }
         
-        /* 防止手機端點擊高亮 */
         * { -webkit-tap-highlight-color: transparent; }
         
         .text-shadow-white { text-shadow: 0 1px 3px rgba(255,255,255,0.9); }
 
-        /* [引] 區塊強制為正體 */
         .quote-style {
             line-height: 2;
             font-style: normal;
@@ -67,12 +68,10 @@
             Menu: () => <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="18" x2="20" y2="18"/></svg>,
             X: ({ size = 32 }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>,
             ChevronDown: ({ className }) => <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>,
-            Upload: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>,
             List: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>,
             ArrowRight: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>,
-            RefreshCw: () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></svg>,
-            Info: () => <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>,
-            CloudDownload: () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 13V2"/><path d="m17 8-5 5-5-5"/><path d="M20 21a2 2 0 0 0 2-2 10 10 0 0 0-20 0 2 2 0 0 0 2 2h16Z"/></svg>
+            RefreshCw: () => <svg className="animate-spin" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></svg>,
+            Layers: () => <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
         };
 
         const App = () => {
@@ -83,34 +82,23 @@
             const [activeChapIdx, setActiveChapIdx] = useState(null);
             const [activeSecIdx, setActiveSecIdx] = useState(-1); 
             const [viewMode, setViewMode] = useState("welcome"); 
-            const [cloudUrl, setCloudUrl] = useState("https://docs.google.com/document/d/1MklGqY-E5bEDl6eR0Qqt3ZM_T6qMztY92IXPWZt4Iqk/edit?usp=drive_link");
             const [isLoading, setIsLoading] = useState(false);
-
-            // 管理目錄中各篇的展開狀態 (null 表示全部收合)
             const [expandedPartIdx, setExpandedPartIdx] = useState(null);
-            const fileInputRef = useRef(null);
             const contentScrollRef = useRef(null);
 
-            // ✨ 核心修正：字元清洗與解析
+            // 固定後端資料來源
+            const cloudUrl = "https://docs.google.com/document/d/1MklGqY-E5bEDl6eR0Qqt3ZM_T6qMztY92IXPWZt4Iqk/edit?usp=drive_link";
+
             const sanitizeTitle = (str) => {
                 if (!str) return "";
-                // 過濾 HTML 標籤
                 const noHtml = str.replace(/<[^>]*>?/gm, '');
-                // 徹底移除換行符、製表符及其實體代碼
-                return noHtml
-                    .replace(/\\n|\\t|\\r/g, '')
-                    .replace(/[\r\n\t]/g, '')
-                    .trim()
-                    .replace(/\s+/g, ' ');
+                return noHtml.replace(/\\n|\\t|\\r/g, '').replace(/[\r\n\t]/g, '').trim().replace(/\s+/g, ' ');
             };
 
             const unescapeContent = (str) => {
                 if (!str) return "";
                 const noHtml = str.replace(/<[^>]*>?/gm, '');
-                // 將字面 \n 轉為實體換行，保留空格
-                return noHtml
-                    .replace(/\\n/g, '\n')
-                    .replace(/\\t/g, '    ');
+                return noHtml.replace(/\\n/g, '\n').replace(/\\t/g, '    ');
             };
 
             const parseText = useCallback((raw) => {
@@ -178,25 +166,8 @@
                 finally { setIsLoading(false); }
             };
 
+            // 啟動即加載
             useEffect(() => { performLoad(cloudUrl); }, []);
-
-            const handleFileUpload = (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    const parsedData = parseText(event.target.result);
-                    if (parsedData.length > 0) {
-                        setData(parsedData);
-                        setActivePartIdx(0); setActiveChapIdx(0); setActiveSecIdx(-1);
-                        setViewMode("part");
-                        setExpandedPartIdx(null);
-                    }
-                };
-                reader.readAsText(file);
-            };
-
-            const triggerFileInput = () => fileInputRef.current.click();
 
             const currentPart = data[activePartIdx];
             const currentChap = currentPart?.chapters[activeChapIdx];
@@ -241,8 +212,6 @@
 
             return (
                 <div className="flex flex-col h-screen bg-white overflow-hidden relative font-sans text-gray-900">
-                    <input type="file" ref={fileInputRef} className="hidden" accept=".txt" onChange={handleFileUpload} />
-
                     {/* 目錄索引頁 */}
                     {isMenuOpen && (
                         <div className="fixed inset-0 z-50 flex items-start justify-center">
@@ -253,42 +222,35 @@
                                     <button onClick={() => setIsMenuOpen(false)} className="p-2 bg-gray-100 rounded-full"><Icons.X size={24} /></button>
                                 </div>
                                 <nav className="flex-1 overflow-y-auto p-6 space-y-4 no-scrollbar">
-                                    {data.length === 0 ? (
-                                        <div className="h-full flex flex-col items-center justify-center text-gray-400 italic py-20 border-2 border-dashed border-gray-300 rounded-2xl">尚未載入資料</div>
-                                    ) : (
-                                        data.map((part, pIdx) => (
-                                            <div key={pIdx} className="mb-4 flex flex-col items-center w-full">
-                                                <div 
-                                                    className={`w-full rounded-3xl font-black text-xl flex items-center transition-all overflow-hidden border ${activePartIdx === pIdx ? 'bg-blue-600 text-white border-blue-500 shadow-lg' : 'bg-gray-50 text-gray-700 border-gray-100'}`}
-                                                >
-                                                    <div className="flex-1 py-6 px-6 select-none flex justify-between items-center" onClick={() => setExpandedPartIdx(expandedPartIdx === pIdx ? null : pIdx)}>
-                                                        <span className="truncate">{part.title}</span>
-                                                        <Icons.ChevronDown className={`transition-transform duration-300 ${expandedPartIdx === pIdx ? 'rotate-180' : ''}`} />
-                                                    </div>
-                                                    {/* ✨ 篇級進入按鈕 */}
-                                                    <button 
-                                                        onClick={(e) => { e.stopPropagation(); setActivePartIdx(pIdx); setViewMode("part"); setIsMenuOpen(false); }}
-                                                        className={`px-8 py-6 border-l font-black text-lg transition-colors ${activePartIdx === pIdx ? 'bg-white/10 border-white/20 active:bg-white/20' : 'bg-white border-gray-100 active:bg-blue-50 text-blue-600'}`}
-                                                    >
-                                                        進入
-                                                    </button>
+                                    {data.map((part, pIdx) => (
+                                        <div key={pIdx} className="mb-4 flex flex-col items-center w-full">
+                                            <div 
+                                                className={`w-full rounded-3xl font-black text-xl flex items-center transition-all overflow-hidden border ${activePartIdx === pIdx ? 'bg-blue-600 text-white border-blue-500 shadow-lg' : 'bg-gray-50 text-gray-700 border-gray-100'}`}
+                                            >
+                                                <div className="flex-1 py-6 px-6 select-none flex justify-between items-center" onClick={() => setExpandedPartIdx(expandedPartIdx === pIdx ? null : pIdx)}>
+                                                    <span className="truncate">{part.title}</span>
+                                                    <Icons.ChevronDown className={`transition-transform duration-300 ${expandedPartIdx === pIdx ? 'rotate-180' : ''}`} />
                                                 </div>
-                                                {expandedPartIdx === pIdx && (
-                                                    <div className="mt-2 w-full flex flex-col items-center space-y-1 animate-dropdown bg-gray-50/50 rounded-3xl p-2 border border-gray-100/50">
-                                                        {part.chapters.map((chap, cIdx) => (
-                                                            <button key={cIdx} onClick={() => { setActivePartIdx(pIdx); handleChapChange(cIdx); }} className={`w-full py-5 px-6 text-xl font-bold text-left transition-all rounded-2xl ${activeChapIdx === cIdx && activePartIdx === pIdx && viewMode !== "part" ? "bg-blue-100 text-blue-800" : "text-gray-500 active:bg-gray-100"}`}>
-                                                                {chap.title}
-                                                            </button>
-                                                        ))}
-                                                    </div>
-                                                )}
+                                                <button 
+                                                    onClick={(e) => { e.stopPropagation(); setActivePartIdx(pIdx); setViewMode("part"); setIsMenuOpen(false); }}
+                                                    className={`px-8 py-6 border-l font-black text-lg transition-colors ${activePartIdx === pIdx ? 'bg-white/10 border-white/20 active:bg-white/20' : 'bg-white border-gray-100 active:bg-blue-50 text-blue-600'}`}
+                                                >
+                                                    進入
+                                                </button>
                                             </div>
-                                        ))
-                                    )}
+                                            {expandedPartIdx === pIdx && (
+                                                <div className="mt-2 w-full flex flex-col items-center space-y-1 animate-dropdown bg-gray-50/50 rounded-3xl p-2 border border-gray-100/50">
+                                                    {part.chapters.map((chap, cIdx) => (
+                                                        <button key={cIdx} onClick={() => { setActivePartIdx(pIdx); handleChapChange(cIdx); }} className={`w-full py-5 px-6 text-xl font-bold text-left transition-all rounded-2xl ${activeChapIdx === cIdx && activePartIdx === pIdx && viewMode !== "part" ? "bg-blue-100 text-blue-800" : "text-gray-500 active:bg-gray-100"}`}>
+                                                            {chap.title}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
                                 </nav>
-                                <div className="p-10 text-center bg-gray-50 border-t">
-                                    <button onClick={() => window.location.reload()} className="text-gray-400 text-xl font-black uppercase tracking-[0.3em] underline decoration-dotted">系統重置</button>
-                                </div>
+                                <div className="p-8 text-center text-xs font-bold text-gray-400 tracking-[0.2em] uppercase opacity-40">Guidebook Navigation</div>
                             </aside>
                         </div>
                     )}
@@ -298,7 +260,7 @@
                         {currentDisplayItem ? (
                             <div className="flex flex-col h-full overflow-hidden">
                                 <section className="h-[40vh] w-full relative bg-gray-200 shrink-0">
-                                    <img src={currentDisplayItem.media || defaultPlaceholder} className={`w-full h-full object-cover ${currentDisplayItem.media ? 'opacity-100' : 'opacity-40 grayscale'}`} alt="Cover" />
+                                    <MediaRenderer content={currentDisplayItem.media} placeholder={defaultPlaceholder} />
                                     <div className="absolute inset-0 bg-gradient-to-t from-white via-white/10 to-transparent"></div>
                                     <div onClick={() => setIsMenuOpen(true)} className="absolute bottom-8 left-8 right-8 text-center cursor-pointer active:scale-95 transition-transform">
                                         <h1 className="text-3xl font-black text-gray-900 leading-tight text-shadow-white tracking-tighter">
@@ -336,18 +298,18 @@
                                 <section ref={contentScrollRef} className="flex-1 overflow-y-auto no-scrollbar content-scroll-area bg-white">
                                     <div className="p-8 pb-32 flex flex-col items-center">
                                         <div className="max-w-xl w-full">
-                                            {/* ✨ [引] 排版：正體、向中對齊、保留換行 */}
+                                            {/* ✨ [引] 排版：縮小字體為 text-lg md:text-xl */}
                                             {currentDisplayItem.quote && (
-                                                <div className="quote-style mb-12 text-center text-2xl font-medium text-gray-500 whitespace-pre-wrap border-y border-gray-100 py-16 bg-gray-50/50 rounded-3xl px-8 shadow-inner" style={{ fontStyle: 'normal' }}>
+                                                <div className="quote-style mb-12 text-center text-lg md:text-xl font-medium text-gray-500 whitespace-pre-wrap border-y border-gray-100 py-12 bg-gray-50/50 rounded-3xl px-8 shadow-inner">
                                                     {currentDisplayItem.quote}
                                                 </div>
                                             )}
 
-                                            {/* ✨ [文] 排版：容器置中、向左對齊、保留換行與空格 */}
+                                            {/* ✨ [文] 排版：縮小字體為 text-xl */}
                                             <article className="flex justify-center w-full">
-                                                <div className="w-full max-w-2xl text-left whitespace-pre-wrap text-3xl font-normal text-gray-800 leading-relaxed">
+                                                <div className="w-full max-w-2xl text-left whitespace-pre-wrap text-xl font-normal text-gray-800 leading-relaxed">
                                                     {currentDisplayItem.content || (
-                                                        <div className="h-48 flex items-center justify-center text-gray-300 text-sm font-bold tracking-widest border-2 border-dashed border-gray-100 rounded-3xl italic">內容載入中...</div>
+                                                        <div className="h-48 flex items-center justify-center text-gray-200 text-sm font-black tracking-widest border-2 border-dashed border-gray-100 rounded-3xl italic uppercase">Content Loading...</div>
                                                     )}
                                                 </div>
                                             </article>
@@ -355,48 +317,31 @@
                                             {!isLastItem() && (
                                                 <div className="mt-20 pt-10 border-t border-gray-100 w-full flex justify-center animate-content">
                                                     <button onClick={goToNext} className="w-full py-8 bg-blue-700 text-white rounded-[2.5rem] shadow-xl flex items-center justify-center gap-4 active:scale-[0.98] active:bg-blue-800 transition-all shadow-blue-200">
-                                                        <span className="text-3xl font-black tracking-widest uppercase">往下一節內容</span>
+                                                        <span className="text-2xl font-black tracking-widest uppercase">往下一節內容</span>
                                                         <Icons.ArrowRight />
                                                     </button>
                                                 </div>
                                             )}
 
                                             {isLastItem() && (
-                                                <div className="mt-20 text-center text-gray-300 font-black text-sm uppercase tracking-[0.4em] py-10 border-t border-gray-50">End of Guidebook</div>
+                                                <div className="mt-20 text-center text-gray-300 font-black text-sm uppercase tracking-[0.4em] py-10 border-t border-gray-50">End of Document</div>
                                             )}
                                         </div>
                                     </div>
                                 </section>
                             </div>
                         ) : (
-                            <div className="h-full flex flex-col items-center justify-center p-12 pt-20 text-center bg-gray-50 overflow-y-auto">
-                                <div className="max-w-xl w-full bg-white rounded-[3rem] shadow-2xl p-10 border-2 border-gray-100">
-                                    <div className="flex items-center justify-center gap-4 mb-10 text-blue-700">
-                                        {isLoading ? <div className="animate-spin"><Icons.RefreshCw /></div> : <Icons.Info />}
-                                        <h2 className="text-3xl font-black tracking-tight">{isLoading ? "載入中..." : "載入導覽手冊"}</h2>
-                                    </div>
-                                    
-                                    <div className="space-y-6 text-left mb-8">
-                                        <div className="p-6 bg-blue-50 rounded-3xl border border-blue-100">
-                                            <p className="text-sm font-black text-blue-600 mb-3 uppercase tracking-widest">方法 A：雲端同步</p>
-                                            <div className="flex gap-2">
-                                                <input type="text" value={cloudUrl} onChange={(e) => setCloudUrl(e.target.value)} placeholder="貼上網址..." className="flex-1 p-4 rounded-xl border border-blue-200 text-lg" />
-                                                <button onClick={() => performLoad(cloudUrl)} className="bg-blue-600 text-white p-4 rounded-xl shadow-lg active:scale-95"><Icons.CloudDownload /></button>
-                                            </div>
-                                        </div>
-                                        <div className="p-6 bg-gray-50 rounded-3xl border border-gray-200" onClick={triggerFileInput}>
-                                            <p className="text-sm font-black text-gray-400 mb-3 uppercase tracking-widest">方法 B：上傳檔案</p>
-                                            <div className="w-full flex items-center justify-center gap-4 p-4 bg-white border-2 border-dashed border-gray-300 rounded-xl text-xl font-bold text-gray-600 cursor-pointer">
-                                                <Icons.Upload /> 選擇 .txt 檔案
-                                            </div>
-                                        </div>
-                                    </div>
+                            /* 試營運載入畫面：簡潔風格 */
+                            <div className="h-full flex flex-col items-center justify-center bg-gray-50 p-12 text-center animate-content">
+                                <div className="text-blue-700 mb-8 opacity-60">
+                                    <Icons.RefreshCw />
                                 </div>
+                                <h2 className="text-2xl font-black text-gray-400 tracking-tighter uppercase">正在同步最新導覽內容...</h2>
                             </div>
                         )}
                     </div>
 
-                    {/* ✨ 底部整列式導覽按鈕 */}
+                    {/* ✨ 底部整列式導覽按鈕：移除上傳按鈕 */}
                     {data.length > 0 && (
                         <footer 
                             onClick={() => setIsMenuOpen(true)}
@@ -415,6 +360,20 @@
             );
         };
 
+        // 媒體渲染輔助
+        const MediaRenderer = ({ content, placeholder }) => {
+            if (!content) return <img src={placeholder} className="w-full h-full object-cover opacity-40 grayscale" />;
+            if (content.trim().startsWith('<')) return <div className="w-full h-full bg-black flex items-center justify-center relative" dangerouslySetInnerHTML={{ __html: content }} />;
+            const youtubeRegex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+            const ytMatch = content.match(youtubeRegex);
+            if (ytMatch) return <iframe className="w-full h-full bg-black" src={`https://www.youtube.com/embed/${ytMatch[1]}?autoplay=0&rel=0`} frameBorder="0" allowFullScreen></iframe>;
+            const videoRegex = /\.(mp4|webm|ogg|mov)$/i;
+            if (videoRegex.test(content)) return <video className="w-full h-full object-contain bg-black" controls playsInline><source src={content} /></video>;
+            return <img src={content} className="w-full h-full object-cover animate-fadeIn" />;
+        };
+
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<App />);
-    </script></body></html>
+    </script>
+</body>
+</html>
