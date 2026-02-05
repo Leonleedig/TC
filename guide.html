@@ -11,8 +11,9 @@
     <meta name="apple-mobile-web-app-title" content="準導覽冊">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#1e40af">
+    <meta name="description" content="智慧結構化文本行動導覽系統">
     
-    <!-- PWA Manifest (Data URI 內嵌) - 已設定正式與縮略名稱 -->
+    <!-- PWA Manifest (Data URI 內嵌) -->
     <link rel="manifest" href='data:application/manifest+json,{"name":"測試版導覽冊","short_name":"準導覽冊","start_url":".","display":"standalone","background_color":"#ffffff","theme_color":"#1e40af","icons":[{"src":"https://img.icons8.com/ios-filled/192/1e40af/stack.png","sizes":"192x192","type":"image/png"},{"src":"https://img.icons8.com/ios-filled/512/1e40af/stack.png","sizes":"512x512","type":"image/png"}]}'>
 
     <!-- iOS 專用圖標 -->
@@ -50,7 +51,6 @@
         
         .text-shadow-white { text-shadow: 0 1px 3px rgba(255,255,255,0.9); }
 
-        /* 引 [Quote] 樣式優化：正體、縮小字級 */
         .quote-style {
             line-height: 2;
             font-style: normal;
@@ -61,6 +61,9 @@
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
         }
+
+        /* 選單細線樣式 */
+        hr { border: 0; border-top: 1px solid rgba(0,0,0,0.05); }
     </style>
 </head>
 <body class="bg-white overflow-hidden">
@@ -80,7 +83,7 @@
 
         const App = () => {
             const [data, setData] = useState([]);
-            const [isMenuOpen, setIsMenuOpen] = useState(false);
+            const [isMenuOpen, setIsMenuOpen] = useState(true);
             const [isSecDropdownOpen, setIsSecDropdownOpen] = useState(false);
             const [activePartIdx, setActivePartIdx] = useState(null);
             const [activeChapIdx, setActiveChapIdx] = useState(null);
@@ -90,7 +93,7 @@
             const [expandedPartIdx, setExpandedPartIdx] = useState(null);
             const contentScrollRef = useRef(null);
 
-            // 預設加載目標
+            // 固定後端資料來源
             const cloudUrl = "https://docs.google.com/document/d/1MklGqY-E5bEDl6eR0Qqt3ZM_T6qMztY92IXPWZt4Iqk/edit?usp=drive_link";
 
             const sanitizeTitle = (str) => {
@@ -170,6 +173,7 @@
                 finally { setIsLoading(false); }
             };
 
+            // 啟動即自動載入內容
             useEffect(() => { performLoad(cloudUrl); }, []);
 
             const currentPart = data[activePartIdx];
@@ -220,40 +224,54 @@
                         <div className="fixed inset-0 z-50 flex items-start justify-center">
                             <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px]" onClick={() => setIsMenuOpen(false)}></div>
                             <aside className="animate-zoomIn w-[94%] h-[calc(100%-100px)] mt-6 bg-white/90 backdrop-blur-2xl shadow-2xl rounded-[2.5rem] flex flex-col border border-white/40 overflow-hidden">
-                                <div className="p-8 border-b border-gray-200/20 flex justify-between items-center bg-white/20">
-                                    <span className="font-black text-3xl tracking-tighter text-gray-900 uppercase">索引目錄</span>
-                                    <button onClick={() => setIsMenuOpen(false)} className="p-2 bg-gray-100 rounded-full"><Icons.X size={24} /></button>
+                                {/* 目錄標題：置中 */}
+                                <div className="p-4 md:p-6 border-b border-gray-200/20 flex items-center justify-center relative bg-white/20">
+                                    <span className="font-black text-xl tracking-tighter text-gray-900 uppercase">目錄</span>
+                                    <button onClick={() => setIsMenuOpen(false)} className="absolute right-4 p-2 bg-gray-100 rounded-full active:scale-90 transition-transform"><Icons.X size={24} /></button>
                                 </div>
-                                <nav className="flex-1 overflow-y-auto p-6 space-y-4 no-scrollbar">
-                                    {data.map((part, pIdx) => (
-                                        <div key={pIdx} className="mb-4 flex flex-col items-center w-full">
-                                            <div 
-                                                className={`w-full rounded-3xl font-black text-xl flex items-center transition-all overflow-hidden border ${activePartIdx === pIdx ? 'bg-blue-600 text-white border-blue-500 shadow-lg' : 'bg-gray-50 text-gray-700 border-gray-100'}`}
-                                            >
-                                                <div className="flex-1 py-6 px-6 select-none flex justify-between items-center" onClick={() => setExpandedPartIdx(expandedPartIdx === pIdx ? null : pIdx)}>
-                                                    <span className="truncate">{part.title}</span>
-                                                    <Icons.ChevronDown className={`transition-transform duration-300 ${expandedPartIdx === pIdx ? 'rotate-180' : ''}`} />
-                                                </div>
-                                                <button 
-                                                    onClick={(e) => { e.stopPropagation(); setActivePartIdx(pIdx); setViewMode("part"); setIsMenuOpen(false); }}
-                                                    className={`px-8 py-6 border-l font-black text-lg transition-colors ${activePartIdx === pIdx ? 'bg-white/10 border-white/20 active:bg-white/20' : 'bg-white border-gray-100 active:bg-blue-50 text-blue-600'}`}
+                                
+                                <nav className="flex-1 overflow-y-auto no-scrollbar">
+                                    {data.length === 0 ? (
+                                        <div className="h-full flex flex-col items-center justify-center text-gray-400 italic py-20 animate-pulse text-xl">正在同步導覽內容...</div>
+                                    ) : (
+                                        data.map((part, pIdx) => (
+                                            <div key={pIdx} className="flex flex-col w-full">
+                                                <div 
+                                                    className={`w-full font-black text-xl flex items-center transition-all overflow-hidden border-b border-gray-100 ${activePartIdx === pIdx ? 'bg-blue-600 text-white' : 'bg-white text-gray-700'}`}
                                                 >
-                                                    進入
-                                                </button>
-                                            </div>
-                                            {expandedPartIdx === pIdx && (
-                                                <div className="mt-2 w-full flex flex-col items-center space-y-1 animate-dropdown bg-gray-50/50 rounded-3xl p-2 border border-gray-100/50">
-                                                    {part.chapters.map((chap, cIdx) => (
-                                                        <button key={cIdx} onClick={() => { setActivePartIdx(pIdx); handleChapChange(cIdx); }} className={`w-full py-5 px-6 text-xl font-bold text-left transition-all rounded-2xl ${activeChapIdx === cIdx && activePartIdx === pIdx && viewMode !== "part" ? "bg-blue-100 text-blue-800" : "text-gray-500 active:bg-gray-100"}`}>
-                                                            {chap.title}
-                                                        </button>
-                                                    ))}
+                                                    <div className="flex-1 py-6 px-6 select-none flex justify-between items-center" onClick={() => setExpandedPartIdx(expandedPartIdx === pIdx ? null : pIdx)}>
+                                                        <span className="truncate">{part.title}</span>
+                                                        <Icons.ChevronDown className={`transition-transform duration-300 ${expandedPartIdx === pIdx ? 'rotate-180' : ''}`} />
+                                                    </div>
+                                                    <button 
+                                                        onClick={(e) => { e.stopPropagation(); setActivePartIdx(pIdx); setViewMode("part"); setIsMenuOpen(false); }}
+                                                        className={`px-8 py-6 border-l font-black text-lg transition-colors ${activePartIdx === pIdx ? 'bg-white/10 border-white/20' : 'bg-gray-50 border-gray-100 text-blue-600'}`}
+                                                    >
+                                                        進入
+                                                    </button>
                                                 </div>
-                                            )}
-                                        </div>
-                                    ))}
+                                                
+                                                {/* 下一層級項目列：移除間距，加入 HR 細線與前綴 */}
+                                                {expandedPartIdx === pIdx && (
+                                                    <div className="flex flex-col bg-gray-50/50">
+                                                        {part.chapters.map((chap, cIdx) => (
+                                                            <div key={cIdx}>
+                                                                <button 
+                                                                    onClick={() => { setActivePartIdx(pIdx); handleChapChange(cIdx); }} 
+                                                                    className={`w-full py-5 px-8 text-xl font-bold text-left transition-all ${activeChapIdx === cIdx && activePartIdx === pIdx && viewMode !== "part" ? "bg-blue-100 text-blue-800" : "text-gray-500 active:bg-gray-100"}`}
+                                                                >
+                                                                    ● {chap.title}
+                                                                </button>
+                                                                <hr />
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ))
+                                    )}
                                 </nav>
-                                <div className="p-8 text-center text-xs font-bold text-gray-400 tracking-[0.2em] uppercase opacity-40">Guidebook Navigation</div>
+                                {/* ✨ 修正：已移除原有的系統重置區塊及其背景線條 */}
                             </aside>
                         </div>
                     )}
@@ -274,23 +292,32 @@
 
                                 {viewMode !== "part" && currentChap?.sections?.length > 0 && (
                                     <div className="bg-white/95 backdrop-blur-md z-20 border-b shrink-0">
-                                        <button onClick={() => setIsSecDropdownOpen(!isSecDropdownOpen)} className="w-full px-8 py-5 flex items-center justify-between text-blue-800 font-black text-sm uppercase tracking-widest relative">
+                                        {/* 小節下拉選單切換按鈕 */}
+                                        <button 
+                                            onClick={() => {
+                                                if (isSecDropdownOpen) {
+                                                    setActiveSecIdx(-1);
+                                                }
+                                                setIsSecDropdownOpen(!isSecDropdownOpen);
+                                            }} 
+                                            className="w-full px-8 py-5 flex items-center justify-between text-blue-800 font-black text-sm uppercase tracking-widest relative"
+                                        >
                                             <div className="flex items-center gap-2">
                                                 <Icons.List />
-                                                <span>{activeSecIdx === -1 ? "看更多內容" : currentChap.sections[activeSecIdx].subtitle}</span>
+                                                <span>{isSecDropdownOpen ? "回到本文" : "更多內容⋯"}</span>
                                             </div>
                                             <Icons.ChevronDown className={`transition-transform duration-300 ${isSecDropdownOpen ? 'rotate-180' : ''}`} />
                                         </button>
                                         
-                                        {/* ✨ 修正：小節下拉選單增加底部間距 pb-32 以免被底部導覽列遮擋 */}
                                         {isSecDropdownOpen && (
                                             <div className="absolute top-full left-0 right-0 bg-white shadow-2xl border-b animate-dropdown z-30">
                                                 <div className="flex flex-col pt-2 pb-32 max-h-[45vh] overflow-y-auto no-scrollbar">
-                                                    <button onClick={() => { setActiveSecIdx(-1); setIsSecDropdownOpen(false); }} className="px-8 py-6 text-center text-sm font-black text-blue-600 bg-blue-50 border-b border-blue-100 flex items-center justify-center gap-3">
-                                                        <Icons.RefreshCw /> <span>回到本段落</span>
-                                                    </button>
                                                     {currentChap.sections.map((sec, sIdx) => (
-                                                        <button key={sIdx} onClick={() => { setActiveSecIdx(sIdx); setIsSecDropdownOpen(false); }} className={`px-8 py-5 text-center text-lg font-bold border-b border-gray-50 ${activeSecIdx === sIdx ? 'bg-blue-100 text-blue-900' : 'text-gray-600 active:bg-gray-100'}`}>
+                                                        <button 
+                                                            key={sIdx} 
+                                                            onClick={() => { setActiveSecIdx(sIdx); setIsSecDropdownOpen(false); }} 
+                                                            className={`px-8 py-5 text-center text-lg font-bold border-b border-gray-50 ${activeSecIdx === sIdx ? 'bg-blue-100 text-blue-900' : 'text-gray-600 active:bg-gray-100'}`}
+                                                        >
                                                             {sec.subtitle}
                                                         </button>
                                                     ))}
@@ -303,26 +330,22 @@
                                 <section ref={contentScrollRef} className="flex-1 overflow-y-auto no-scrollbar content-scroll-area bg-white">
                                     <div className="p-8 pb-32 flex flex-col items-center">
                                         <div className="max-w-xl w-full">
-                                            {/* ✨ [引] 排版：字體 text-lg */}
                                             {currentDisplayItem.quote && (
                                                 <div className="quote-style mb-12 text-center text-lg md:text-xl font-medium text-gray-500 whitespace-pre-wrap border-y border-gray-100 py-12 bg-gray-50/50 rounded-3xl px-8 shadow-inner">
                                                     {currentDisplayItem.quote}
                                                 </div>
                                             )}
 
-                                            {/* ✨ [文] 排版：字體 text-xl */}
                                             <article className="flex justify-center w-full">
                                                 <div className="w-full max-w-2xl text-left whitespace-pre-wrap text-xl font-normal text-gray-800 leading-relaxed">
-                                                    {currentDisplayItem.content || (
-                                                        <div className="h-48 flex items-center justify-center text-gray-200 text-sm font-black tracking-widest border-2 border-dashed border-gray-100 rounded-3xl italic uppercase">Content Loading...</div>
-                                                    )}
+                                                    {currentDisplayItem.content || null}
                                                 </div>
                                             </article>
 
                                             {!isLastItem() && (
                                                 <div className="mt-20 pt-10 border-t border-gray-100 w-full flex justify-center animate-content">
                                                     <button onClick={goToNext} className="w-full py-8 bg-blue-700 text-white rounded-[2.5rem] shadow-xl flex items-center justify-center gap-4 active:scale-[0.98] active:bg-blue-800 transition-all shadow-blue-200">
-                                                        <span className="text-2xl font-black tracking-widest uppercase">往下一節內容</span>
+                                                        <span className="text-3xl font-black tracking-widest uppercase">下一頁</span>
                                                         <Icons.ArrowRight />
                                                     </button>
                                                 </div>
@@ -336,7 +359,6 @@
                                 </section>
                             </div>
                         ) : (
-                            /* 試營運載入畫面 */
                             <div className="h-full flex flex-col items-center justify-center bg-gray-50 p-12 text-center animate-content">
                                 <div className="text-blue-700 mb-8 opacity-60">
                                     <Icons.RefreshCw />
@@ -346,7 +368,7 @@
                         )}
                     </div>
 
-                    {/* ✨ 底部整列式導覽按鈕 */}
+                    {/* 底部導覽列 */}
                     {data.length > 0 && (
                         <footer 
                             onClick={() => setIsMenuOpen(true)}
@@ -354,7 +376,7 @@
                         >
                             <div className="flex items-center gap-6">
                                 <Icons.Menu />
-                                <span className="text-3xl font-black tracking-[0.2em] uppercase">按我進目錄</span>
+                                <span className="text-3xl font-black tracking-[0.2em] uppercase">目錄</span>
                             </div>
                         </footer>
                     )}
@@ -377,7 +399,6 @@
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<App />);
 
-        // ✨ 關鍵 PWA Service Worker 註冊：確保手機瀏覽器識別為可安裝 App
         if ('serviceWorker' in navigator) {
             const swCode = `
                 const CACHE_NAME = 'guide-v2';
