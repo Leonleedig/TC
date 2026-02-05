@@ -253,9 +253,7 @@
                                         </div>
                                     ))}
                                 </nav>
-                                <div className="p-10 text-center bg-gray-50 border-t">
-                                    <button onClick={() => window.location.reload()} className="text-gray-400 text-sm font-bold uppercase tracking-[0.3em] underline decoration-dotted">系統重置</button>
-                                </div>
+                                <div className="p-8 text-center text-xs font-bold text-gray-400 tracking-[0.2em] uppercase opacity-40">Guidebook Navigation</div>
                             </aside>
                         </div>
                     )}
@@ -283,9 +281,11 @@
                                             </div>
                                             <Icons.ChevronDown className={`transition-transform duration-300 ${isSecDropdownOpen ? 'rotate-180' : ''}`} />
                                         </button>
+                                        
+                                        {/* ✨ 修正：小節下拉選單增加底部間距 pb-32 以免被底部導覽列遮擋 */}
                                         {isSecDropdownOpen && (
                                             <div className="absolute top-full left-0 right-0 bg-white shadow-2xl border-b animate-dropdown z-30">
-                                                <div className="flex flex-col py-2 max-h-[45vh] overflow-y-auto">
+                                                <div className="flex flex-col pt-2 pb-32 max-h-[45vh] overflow-y-auto no-scrollbar">
                                                     <button onClick={() => { setActiveSecIdx(-1); setIsSecDropdownOpen(false); }} className="px-8 py-6 text-center text-sm font-black text-blue-600 bg-blue-50 border-b border-blue-100 flex items-center justify-center gap-3">
                                                         <Icons.RefreshCw /> <span>回到本段落</span>
                                                     </button>
@@ -314,7 +314,7 @@
                                             <article className="flex justify-center w-full">
                                                 <div className="w-full max-w-2xl text-left whitespace-pre-wrap text-xl font-normal text-gray-800 leading-relaxed">
                                                     {currentDisplayItem.content || (
-                                                        <div className="h-48 flex items-center justify-center text-gray-200 text-sm font-black tracking-widest border-2 border-dashed border-gray-100 rounded-3xl italic uppercase">內容載入中...</div>
+                                                        <div className="h-48 flex items-center justify-center text-gray-200 text-sm font-black tracking-widest border-2 border-dashed border-gray-100 rounded-3xl italic uppercase">Content Loading...</div>
                                                     )}
                                                 </div>
                                             </article>
@@ -346,7 +346,7 @@
                         )}
                     </div>
 
-                    {/* ✨ 底部整列式導覽按鈕：已移除數字指示器，回歸純淨目錄觸發 */}
+                    {/* ✨ 底部整列式導覽按鈕 */}
                     {data.length > 0 && (
                         <footer 
                             onClick={() => setIsMenuOpen(true)}
@@ -379,7 +379,6 @@
 
         // ✨ 關鍵 PWA Service Worker 註冊：確保手機瀏覽器識別為可安裝 App
         if ('serviceWorker' in navigator) {
-            // 動態產生包含 fetch 監聽器的 SW，這是安裝提示出現的必要條件
             const swCode = `
                 const CACHE_NAME = 'guide-v2';
                 self.addEventListener('install', (e) => {
@@ -390,7 +389,6 @@
                     e.waitUntil(clients.claim());
                 });
                 self.addEventListener('fetch', (e) => {
-                    // 基本攔截以滿足 PWA 規範
                     e.respondWith(caches.match(e.request).then((res) => res || fetch(e.request)));
                 });
             `;
