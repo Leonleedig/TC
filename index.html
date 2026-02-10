@@ -5,17 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>測試版導覽冊</title>
     
-    <!-- PWA 核心配置 -->
+       <!-- PWA 核心配置 -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="準導覽冊">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#1e40af">
-    <meta name="description" content="行動導覽器">
     
-    <!-- PWA Manifest (Data URI 內嵌) -->
-    <link rel="manifest" href='data:application/manifest+json,{"name":"測試版導覽冊","short_name":"準導覽冊","start_url":".","display":"standalone","background_color":"#ffffff","theme_color":"#1e40af","icons":[{"src":"https://img.icons8.com/ios-filled/192/1e40af/stack.png","sizes":"192x192","type":"image/png"},{"src":"https://img.icons8.com/ios-filled/512/1e40af/stack.png","sizes":"512x512","type":"image/png"}]}'>
+    <!-- ✨ 正式寫法：連結到實體 manifest.json 檔案 -->
+    <link rel="manifest" href="manifest.json">
 
+    <!-- ✨ 建議準備實體圖示檔存放於同目錄 -->
+    <link rel="apple-touch-icon" href="icon-180.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
     <!-- iOS 專用圖標 -->
     <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/Leonleedig/TC/main/icon-512.png">
     <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/Leonleedig/main/TC/icon-192.png">
